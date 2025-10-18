@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* === Custom Theme Colors === */
+@layer base {
+    html.dark {
+        --bg: #0a0f1c;
+        --card: #111827;
+        --text: #f1f5f9;
+        --muted: #9ca3af;
+    }
+
+    html.light {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #0a0f1c;
+        --muted: #475569;
+    }
+
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+}
+
+/* Sizga kerak bo‘lsa, kartalar yoki knopkalar uchun ham CSS o‘zgaruvchilarni qo‘shish mumkin: */
+@layer components {
+    .card {
+        background-color: var(--card);
+        color: var(--text);
+        border: 1px solid var(--muted);
+    }
+}
+@layer utilities {
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease forwards;
+    }
+}
