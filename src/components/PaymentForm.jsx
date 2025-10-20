@@ -38,13 +38,13 @@ export default function PaymentForm({ service, onPayingChange }) {
             }
         } else if (isPremium) {
             switch (selectedPlan) {
-                case "3 oy":
+                case "3":
                     total = 1000;
                     break;
-                case "6 oy":
+                case "6":
                     total = 2000;
                     break;
-                case "12 oy":
+                case "12":
                     total = 3000;
                     break;
                 default:
@@ -215,7 +215,7 @@ export default function PaymentForm({ service, onPayingChange }) {
 
                     {isPremium && (
                         <div className="flex justify-between">
-                            {["3 ", "6 ", "12 "].map((plan) => (
+                            {["3", "6", "12"].map((plan) => (
                                 <button
                                     key={plan}
                                     onClick={() => setSelectedPlan(plan)}
