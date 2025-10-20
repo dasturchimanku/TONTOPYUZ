@@ -97,6 +97,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                         service: service.title,
                         priceUZS,
                         amount,
+                        plan: selectedPlan,
                     }),
                 }
             );
@@ -111,7 +112,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                 onPayingChange?.(false); // 🔄 Loaderni o‘chirish
             }
         } catch (err) {
-            alert("Server bilan aloqa xatosi.");
+            alert("Server bilan aloqa xatosi.", err);
             setIsPaying(false);
             onPayingChange?.(false);
         }
