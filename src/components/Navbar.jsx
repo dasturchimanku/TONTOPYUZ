@@ -11,8 +11,8 @@ export default function Navbar() {
 
     const languages = [
         { code: "uz", label: "UZ" },
-        { code: "en", label: "ENG" },
-        { code: "ru", label: "RUS" },
+        { code: "en", label: "EN" },
+        { code: "ru", label: "RU" },
     ];
 
     const selectedLang = languages.find((l) => l.code === lang);
