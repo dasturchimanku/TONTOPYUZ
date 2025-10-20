@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getTelegramUser } from "../utils/getTelegramUser";
+import { useLang } from "../contexts/LangContext";
 
 export default function PaymentForm({ service, onPayingChange }) {
     const [username, setUsername] = useState("");
@@ -11,12 +12,13 @@ export default function PaymentForm({ service, onPayingChange }) {
     const [priceUZS, setPriceUZS] = useState(0);
     const [amountError, setAmountError] = useState("");
     const [isPaying, setIsPaying] = useState(false); // 🔄 Lokal loader holati
+    const { strings } = useLang();
 
     const isPremium = service?.title?.toLowerCase() === "premium";
     const isVariable = ["star", "ton"].includes(service?.title?.toLowerCase());
 
     const minStar = 50;
-    const minTon = 0.3;
+    const minTon = 1;
 
     // 💰 Narxni hisoblash
     useEffect(() => {
@@ -27,11 +29,11 @@ export default function PaymentForm({ service, onPayingChange }) {
             const amt = parseFloat(amount) || 0;
             if (service.title.toLowerCase() === "star") {
                 if (amt > 0 && amt < minStar)
-                    errorText = `Eng kam miqdor ${minStar} ta Star`;
+                    errorText = `${strings.min} ${minStar} ${strings.stars}`;
                 total = amt * 250;
             } else if (service.title.toLowerCase() === "ton") {
                 if (amt > 0 && amt < minTon)
-                    errorText = `Eng kam miqdor ${minTon} TON`;
+                    errorText = `${strings.min} ${minTon} ${strings.TON}`;
                 total = amt * 1000;
             }
         } else if (isPremium) {
@@ -73,7 +75,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                 setError(null);
             } else {
                 setUserInfo(null);
-                setError("Profil topilmadi");
+                setError(strings.user_not_found);
             }
         }, 800);
 
@@ -107,12 +109,12 @@ export default function PaymentForm({ service, onPayingChange }) {
             if (data.success && data.payment_url) {
                 window.location.href = data.payment_url; // Click sahifasiga o‘tish
             } else {
-                alert("Xato: to‘lovni yaratib bo‘lmadi.");
+                alert(strings.server_error || "Server xatosi.");
                 setIsPaying(false);
                 onPayingChange?.(false); // 🔄 Loaderni o‘chirish
             }
         } catch (err) {
-            alert("Server bilan aloqa xatosi.", err);
+            alert(strings.server_error, err);
             setIsPaying(false);
             onPayingChange?.(false);
         }
@@ -132,7 +134,7 @@ export default function PaymentForm({ service, onPayingChange }) {
     return (
         <div className="w-full max-w-md mx-auto p-6 bg-white/5 dark:bg-black/30 backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 transition-all duration-300">
             <h2 className="text-xl font-semibold text-center mb-4 text-white dark:text-white/90">
-                {service.title} uchun to‘lov
+                {service.title} {strings.purchase}
             </h2>
 
             {/* Username input */}
@@ -196,7 +198,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                                     service.title === "Star" ? minStar : minTon
                                 }
                                 step={service.title === "Star" ? 1 : 0.1}
-                                placeholder={`Miqdor (${
+                                placeholder={`${strings.quantity_amount} (${
                                     service.title === "Star" ? "⭐" : "TON"
                                 })`}
                                 value={amount}
@@ -213,7 +215,7 @@ export default function PaymentForm({ service, onPayingChange }) {
 
                     {isPremium && (
                         <div className="flex justify-between">
-                            {["3 oy", "6 oy", "12 oy"].map((plan) => (
+                            {["3 ", "6 ", "12 "].map((plan) => (
                                 <button
                                     key={plan}
                                     onClick={() => setSelectedPlan(plan)}
@@ -224,6 +226,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                                     }`}
                                 >
                                     {plan}
+                                    {strings.months}
                                 </button>
                             ))}
                         </div>
@@ -249,10 +252,10 @@ export default function PaymentForm({ service, onPayingChange }) {
                         {isPaying ? (
                             <div className="flex items-center space-x-2">
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                <span>Yuborilmoqda...</span>
+                                <span>{strings.sending}</span>
                             </div>
                         ) : (
-                            "To‘lovni boshlash"
+                            strings.pay_now
                         )}
                     </button>
                 </div>
