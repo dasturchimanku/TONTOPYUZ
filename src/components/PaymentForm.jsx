@@ -32,7 +32,7 @@ export default function PaymentForm({ service, onPayingChange }) {
             } else if (service.title.toLowerCase() === "ton") {
                 if (amt > 0 && amt < minTon)
                     errorText = `Eng kam miqdor ${minTon} TON`;
-                total = amt * 40000;
+                total = amt * 1000;
             }
         } else if (isPremium) {
             switch (selectedPlan) {
