@@ -43,7 +43,7 @@ export default function Footer() {
 
             {/* Pastki yozuv */}
             <p className="mt-4 text-xs text-gray-500 dark:text-gray-500">
-                © {new Date().getFullYear()} HEREX.UZ — All rights reserved.
+                © {new Date().getFullYear()} HEREX.UZ — {strings.footer}.
             </p>
         </footer>
     );
