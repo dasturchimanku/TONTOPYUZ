@@ -10,53 +10,63 @@ export default function PaymentForm({ service, onPayingChange }) {
     const [amount, setAmount] = useState("");
     const [selectedPlan, setSelectedPlan] = useState("");
     const [priceUZS, setPriceUZS] = useState(0);
+    const [prices, setPrices] = useState({});
     const [amountError, setAmountError] = useState("");
     const [isPaying, setIsPaying] = useState(false);
     const { strings } = useLang();
 
     const isPremium = service?.title?.toLowerCase() === "premium";
     const isVariable = ["star", "ton"].includes(service?.title?.toLowerCase());
-
     const minStar = 50;
     const minTon = 1;
 
-    // 💰 Narxni hisoblash
+    // 🧩 Narxlarni MySQL’dan olish
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await fetch(
+                    "https://6899d9e381ab8.xvest5.ru/get_prices.php"
+                );
+                const data = await res.json();
+                if (data.success) setPrices(data.prices);
+            } catch (err) {
+                console.error("❌ Narxlarni olishda xato:", err);
+            }
+        })();
+    }, []);
+
+    // 💰 Dinamik hisob
     useEffect(() => {
         let total = 0;
         let errorText = "";
 
+        const title = service.title.toLowerCase();
+        const amt = parseFloat(amount) || 0;
+
         if (isVariable) {
-            const amt = parseFloat(amount) || 0;
-            if (service.title.toLowerCase() === "star") {
-                if (amt > 0 && amt < minStar)
+            const pricePer =
+                title === "star" ? prices.star || 0 : prices.ton || 0;
+
+            // ⚙️ faqat foydalanuvchi qiymat kiritgan bo‘lsa tekshiramiz
+            if (amount !== "") {
+                if (title === "star" && amt < minStar)
                     errorText = `${strings.min} ${minStar} ${strings.stars}`;
-                total = amt * 20;
-            } else if (service.title.toLowerCase() === "ton") {
-                if (amt > 0 && amt < minTon)
+                if (title === "ton" && amt < minTon)
                     errorText = `${strings.min} ${minTon} ${strings.TON}`;
-                total = amt * 1000;
             }
+
+            total = amt * pricePer;
         } else if (isPremium) {
-            switch (selectedPlan) {
-                case "3":
-                    total = 1000;
-                    break;
-                case "6":
-                    total = 2000;
-                    break;
-                case "12":
-                    total = 3000;
-                    break;
-                default:
-                    total = 0;
-            }
+            if (selectedPlan === "3") total = prices.premium3 || 0;
+            if (selectedPlan === "6") total = prices.premium6 || 0;
+            if (selectedPlan === "12") total = prices.premium12 || 0;
         }
 
         setAmountError(errorText);
         setPriceUZS(total);
-    }, [amount, selectedPlan, service, strings]);
+    }, [amount, selectedPlan, service, prices, strings]);
 
-    // 👤 Telegram foydalanuvchi ma'lumotini olish (debounce bilan)
+    // 👤 Telegram foydalanuvchi
     useEffect(() => {
         if (!username) {
             setUserInfo(null);
@@ -69,7 +79,6 @@ export default function PaymentForm({ service, onPayingChange }) {
             setError(null);
             const user = await getTelegramUser(username);
             setLoading(false);
-
             if (user) {
                 setUserInfo(user);
                 setError(null);
@@ -82,7 +91,7 @@ export default function PaymentForm({ service, onPayingChange }) {
         return () => clearTimeout(timer);
     }, [username, strings]);
 
-    // 🧭 To‘lovni yuborish
+    // 💳 To‘lov
     const handlePayment = async () => {
         if (isPaying) return;
         setIsPaying(true);
@@ -106,30 +115,21 @@ export default function PaymentForm({ service, onPayingChange }) {
             );
 
             const data = await res.json();
-
             if (data.success && data.payment_url) {
                 window.location.href = data.payment_url;
             } else {
-                console.error("❌ Server javobi:", data);
-                alert(
-                    strings.server_error ||
-                        "Server xatosi. Iltimos, qayta urinib ko‘ring."
-                );
+                alert(strings.server_error || "Server xatosi.");
                 setIsPaying(false);
                 onPayingChange?.(false);
             }
         } catch (err) {
-            console.error("⚠️ So‘rovda xato:", err);
-            alert(
-                strings.server_error ||
-                    "Server bilan bog‘lanishda xatolik yuz berdi."
-            );
+            console.error("⚠️ Xatolik:", err);
+            alert(strings.server_error || "Server bilan bog‘lanishda xatolik.");
             setIsPaying(false);
             onPayingChange?.(false);
         }
     };
 
-    // ✅ To‘lov shartlarini tekshirish
     const validAmount =
         !amountError &&
         ((isPremium && selectedPlan) ||
@@ -142,45 +142,33 @@ export default function PaymentForm({ service, onPayingChange }) {
     const canPay = userInfo && validAmount && !isPaying;
 
     return (
-        <div className="w-full max-w-md mx-auto p-6 bg-white/5 dark:bg-black/30 backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 transition-all duration-300">
+        <div className="w-full max-w-md mx-auto p-6 bg-white/5 dark:bg-black/30 backdrop-blur-xl rounded-2xl shadow-lg border border-white/10">
             <h2 className="text-xl font-semibold text-center mb-4 text-white dark:text-white/90">
                 {service.title} {strings.purchase}
             </h2>
 
-            {/* Username input */}
+            {/* Username */}
             <input
                 type="text"
                 placeholder="@username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
             />
 
-            {/* Loading skeleton */}
+            {/* Telegram user */}
             {loading && (
-                <div className="flex items-center mt-4 space-x-3 animate-pulse">
-                    <div className="w-12 h-12 bg-gray-600/40 rounded-full" />
-                    <div className="flex-1">
-                        <div className="w-32 h-4 bg-gray-600/40 rounded mb-2" />
-                        <div className="w-20 h-3 bg-gray-600/40 rounded" />
-                    </div>
-                </div>
+                <p className="text-gray-400 text-center mt-4">Loading...</p>
             )}
-
-            {/* Profil topildi */}
-            {userInfo && !loading && (
-                <div className="flex items-center mt-4 p-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 transition-all duration-300">
-                    {userInfo.photo ? (
-                        <img
-                            src={userInfo.photo}
-                            alt={userInfo.name}
-                            className="w-12 h-12 rounded-full border border-white/20"
-                        />
-                    ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-500" />
-                    )}
-                    <div className="ml-3">
-                        <p className="text-white font-semibold">
+            {userInfo && (
+                <div className="mt-4 flex items-center gap-3 bg-white/10 p-3 rounded-xl">
+                    <img
+                        src={userInfo.photo}
+                        alt="user"
+                        className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                        <p className="text-white font-medium">
                             {userInfo.name}
                         </p>
                         <p className="text-gray-400 text-sm">
@@ -189,17 +177,15 @@ export default function PaymentForm({ service, onPayingChange }) {
                     </div>
                 </div>
             )}
-
-            {/* Profil topilmadi */}
-            {error && !loading && (
-                <div className="mt-4 text-center text-red-400 bg-red-400/10 p-3 rounded-xl backdrop-blur-md border border-red-400/20 transition-all duration-300">
+            {error && (
+                <p className="text-red-400 text-center mt-3 bg-red-400/10 rounded-lg p-2">
                     {error}
-                </div>
+                </p>
             )}
 
-            {/* To‘lov maydoni */}
+            {/* Amount or plan */}
             {userInfo && !error && (
-                <div className="mt-6 space-y-3 transition-all duration-300">
+                <div className="mt-6 space-y-3">
                     {isVariable && (
                         <>
                             <input
@@ -207,17 +193,16 @@ export default function PaymentForm({ service, onPayingChange }) {
                                 min={
                                     service.title === "Star" ? minStar : minTon
                                 }
-                                step={service.title === "Star" ? 1 : 0.1}
                                 placeholder={`${strings.quantity_amount} (${
                                     service.title === "Star" ? "⭐" : "TON"
                                 })`}
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                className="w-full p-3 rounded-xl bg-white/10 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
                             />
                             {amountError && (
-                                <p className="text-sm text-red-400 text-center">
-                                    ⚠️ {amountError}
+                                <p className="text-red-400 text-center text-sm">
+                                    {amountError}
                                 </p>
                             )}
                         </>
@@ -229,7 +214,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                                 <button
                                     key={plan}
                                     onClick={() => setSelectedPlan(plan)}
-                                    className={`flex-1 mx-1 py-2 rounded-xl border text-sm transition-all ${
+                                    className={`flex-1 mx-1 py-2 rounded-xl text-sm border ${
                                         selectedPlan === plan
                                             ? "bg-blue-600 text-white border-blue-500"
                                             : "bg-white/10 text-gray-300 border-white/20 hover:bg-white/20"
@@ -241,31 +226,22 @@ export default function PaymentForm({ service, onPayingChange }) {
                         </div>
                     )}
 
-                    {/* 💸 Dinamik narx */}
                     {priceUZS > 0 && (
                         <div className="text-center mt-3 text-lg font-semibold text-green-400">
                             {priceUZS.toLocaleString()} so‘m
                         </div>
                     )}
 
-                    {/* Pay button */}
                     <button
                         disabled={!canPay}
                         onClick={handlePayment}
-                        className={`w-full py-3 mt-2 rounded-xl font-semibold transition-all flex items-center justify-center ${
+                        className={`w-full py-3 mt-2 rounded-xl font-semibold flex items-center justify-center ${
                             canPay
                                 ? "bg-blue-600 hover:bg-blue-700 text-white"
                                 : "bg-gray-600/40 text-gray-400 cursor-not-allowed"
                         }`}
                     >
-                        {isPaying ? (
-                            <div className="flex items-center space-x-2">
-                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                <span>{strings.sending}</span>
-                            </div>
-                        ) : (
-                            strings.pay_now
-                        )}
+                        {isPaying ? strings.sending : strings.pay_now}
                     </button>
                 </div>
             )}

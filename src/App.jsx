@@ -4,37 +4,24 @@ import {
     Routes,
     Route,
     Navigate,
-    useLocation,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import Footer from "./components/Footer";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LangProvider } from "./contexts/LangContext";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
-function Layout({ children }) {
-    return (
-        <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow px-4 sm:px-6 pt-16 sm:pt-0">
-                {children}
-            </main>
-            <Footer />
-        </div>
-    );
-}
-
-// 🔐 Admin sahifalariga kirish uchun guard
 function PrivateRoute({ children }) {
     const token = localStorage.getItem("admin_token");
-    const expires = parseInt(localStorage.getItem("admin_expires")) || 0;
+    const expires = parseInt(localStorage.getItem("admin_expires") || "0", 10);
     const now = Math.floor(Date.now() / 1000);
 
     if (!token || now > expires) {
         localStorage.removeItem("admin_token");
         localStorage.removeItem("admin_expires");
+        localStorage.removeItem("admin_user");
         return <Navigate to="/admin/login" replace />;
     }
 
@@ -47,10 +34,7 @@ export default function App() {
             <LangProvider>
                 <Router>
                     <Routes>
-                        {/* 🔑 Admin Login */}
                         <Route path="/admin/login" element={<AdminLogin />} />
-
-                        {/* 🔒 Admin Dashboard */}
                         <Route
                             path="/admin"
                             element={
@@ -59,19 +43,18 @@ export default function App() {
                                 </PrivateRoute>
                             }
                         />
-
-                        {/* 🌍 Asosiy sahifalar */}
                         <Route
-                            path="/"
+                            path="*"
                             element={
-                                <Layout>
-                                    <Home />
-                                </Layout>
+                                <div className="min-h-screen flex flex-col">
+                                    <Navbar />
+                                    <main className="flex-grow px-4 sm:px-6 pt-16 sm:pt-0">
+                                        <Home />
+                                    </main>
+                                    <Footer />
+                                </div>
                             }
                         />
-
-                        {/* ❌ Not found => Home */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </Router>
             </LangProvider>
