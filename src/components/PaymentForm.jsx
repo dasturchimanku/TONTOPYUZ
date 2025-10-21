@@ -11,7 +11,7 @@ export default function PaymentForm({ service, onPayingChange }) {
     const [selectedPlan, setSelectedPlan] = useState("");
     const [priceUZS, setPriceUZS] = useState(0);
     const [amountError, setAmountError] = useState("");
-    const [isPaying, setIsPaying] = useState(false); // 🔄 Lokal loader holati
+    const [isPaying, setIsPaying] = useState(false);
     const { strings } = useLang();
 
     const isPremium = service?.title?.toLowerCase() === "premium";
@@ -30,7 +30,7 @@ export default function PaymentForm({ service, onPayingChange }) {
             if (service.title.toLowerCase() === "star") {
                 if (amt > 0 && amt < minStar)
                     errorText = `${strings.min} ${minStar} ${strings.stars}`;
-                total = amt * 250;
+                total = amt * 20;
             } else if (service.title.toLowerCase() === "ton") {
                 if (amt > 0 && amt < minTon)
                     errorText = `${strings.min} ${minTon} ${strings.TON}`;
@@ -54,9 +54,9 @@ export default function PaymentForm({ service, onPayingChange }) {
 
         setAmountError(errorText);
         setPriceUZS(total);
-    }, [amount, selectedPlan, service]);
+    }, [amount, selectedPlan, service, strings]);
 
-    // 👤 Telegram username orqali userni olish
+    // 👤 Telegram foydalanuvchi ma'lumotini olish (debounce bilan)
     useEffect(() => {
         if (!username) {
             setUserInfo(null);
@@ -77,49 +77,59 @@ export default function PaymentForm({ service, onPayingChange }) {
                 setUserInfo(null);
                 setError(strings.user_not_found);
             }
-        }, 800);
+        }, 700);
 
         return () => clearTimeout(timer);
-    }, [username]);
+    }, [username, strings]);
 
     // 🧭 To‘lovni yuborish
     const handlePayment = async () => {
-        if (isPaying) return; // 🔒 Faqat bir marta bosilishi uchun
+        if (isPaying) return;
         setIsPaying(true);
-        onPayingChange?.(true); // 🔄 Modaldagi loaderni yoqish
+        onPayingChange?.(true);
 
         try {
+            const payload = {
+                username,
+                service: service.title.toLowerCase(),
+                priceUZS,
+                amount: isPremium ? selectedPlan : amount,
+            };
+
             const res = await fetch(
                 "https://6899d9e381ab8.xvest5.ru/create_payment.php",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        username,
-                        service: service.title,
-                        priceUZS,
-                        amount,
-                        plan: selectedPlan,
-                    }),
+                    body: JSON.stringify(payload),
                 }
             );
 
             const data = await res.json();
 
             if (data.success && data.payment_url) {
-                window.location.href = data.payment_url; // Click sahifasiga o‘tish
+                window.location.href = data.payment_url;
             } else {
-                alert(strings.server_error || "Server xatosi.");
+                console.error("❌ Server javobi:", data);
+                alert(
+                    strings.server_error ||
+                        "Server xatosi. Iltimos, qayta urinib ko‘ring."
+                );
                 setIsPaying(false);
-                onPayingChange?.(false); // 🔄 Loaderni o‘chirish
+                onPayingChange?.(false);
             }
         } catch (err) {
-            alert(strings.server_error, err);
+            console.error("⚠️ So‘rovda xato:", err);
+            alert(
+                strings.server_error ||
+                    "Server bilan bog‘lanishda xatolik yuz berdi."
+            );
             setIsPaying(false);
             onPayingChange?.(false);
         }
     };
 
+    // ✅ To‘lov shartlarini tekshirish
     const validAmount =
         !amountError &&
         ((isPremium && selectedPlan) ||
@@ -225,8 +235,7 @@ export default function PaymentForm({ service, onPayingChange }) {
                                             : "bg-white/10 text-gray-300 border-white/20 hover:bg-white/20"
                                     }`}
                                 >
-                                    {plan}
-                                    {strings.months}
+                                    {plan} {strings.months}
                                 </button>
                             ))}
                         </div>
