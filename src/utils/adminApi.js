@@ -1,4 +1,4 @@
-const API_BASE = "https://6899d9e381ab8.xvest5.ru/admin/api";
+const API_BASE = "https://6899d9e381ab8.xvest5.ru/api/admin";
 function authHeader() {
     const token = localStorage.getItem("admin_token");
     return token ? { Authorization: `Bearer ${token}` } : {};
