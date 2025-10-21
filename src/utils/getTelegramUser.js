@@ -17,7 +17,7 @@ export async function getTelegramUser(username) {
         });
 
         const data = await response.json();
-        console.log("Fragment API response:", data);
+        // console.log("Fragment API response:", data);
 
         if (data?.success && data?.found) {
             // photo HTML tagdan URL ni ajratamiz
