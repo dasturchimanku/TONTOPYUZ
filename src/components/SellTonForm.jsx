@@ -4,7 +4,7 @@ const RATE_PER_TON = 15000; // so'm
 const MY_TON_ADDRESS = "UQDwMDn58CqyLEvj6sfDM4E-ChR8BDr3vLM6RkW4MAHu9f6W";
 
 export default function SellTonForm({ t }) {
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState(0); // foydalanuvchi kiritadi (TON)
     const [price, setPrice] = useState(0);
     const [cardNumber, setCardNumber] = useState("");
     const [error, setError] = useState("");
@@ -28,7 +28,7 @@ export default function SellTonForm({ t }) {
         setLoading(true);
 
         try {
-            // Backend server URL
+            // 1️⃣ Backendga ma'lumot yuborish
             const res = await fetch(
                 "https://6899d9e381ab8.xvest5.ru/tontopy/sell_ton/createSell.php",
                 {
@@ -46,8 +46,11 @@ export default function SellTonForm({ t }) {
                 return;
             }
 
-            // TON Keeper oynasini ochish
-            const tonKeeperLink = `https://app.tonkeeper.com/transfer/${MY_TON_ADDRESS}?amount=${amount}&text=TON%20sotish`;
+            // 2️⃣ TON Keeper oynasini ochish
+            // nanoTON ga aylantirish: 1 TON = 1_000_000_000 nanoTON
+            const nanoAmount = amount * 1_000_000_000;
+
+            const tonKeeperLink = `https://app.tonkeeper.com/transfer/${MY_TON_ADDRESS}?amount=${nanoAmount}&text=TON%20sotish`;
             window.open(tonKeeperLink, "_blank");
 
             setSuccess(
