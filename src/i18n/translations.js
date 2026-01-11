@@ -1,0 +1,40 @@
+const translations = {
+    uz: {
+        buy: "TON sotib olish",
+        sell: "TON sotish",
+        introBuy: "TON kriptovalyutasini xavfsiz sotib oling.",
+        introSell: "TON kriptovalyutasini tezda sotib pulga aylantiring.",
+        address: "TON manzil (UQ...)",
+        amount: "TON miqdori",
+        price: "Narx",
+        pay: "Davom etish",
+        support: "Support",
+        invalid: "TON manzil noto‘g‘ri",
+    },
+    ru: {
+        buy: "Купить TON",
+        sell: "Продать TON",
+        introBuy: "Покупайте TON безопасно.",
+        introSell: "Продайте TON и получите деньги.",
+        address: "TON адрес (UQ...)",
+        amount: "Количество TON",
+        price: "Цена",
+        pay: "Продолжить",
+        support: "Support",
+        invalid: "TON адрес неверный",
+    },
+    en: {
+        buy: "Buy TON",
+        sell: "Sell TON",
+        introBuy: "Buy TON safely.",
+        introSell: "Sell TON and receive money.",
+        address: "TON address (UQ...)",
+        amount: "TON amount",
+        price: "Price",
+        pay: "Continue",
+        support: "Support",
+        invalid: "Invalid TON address",
+    },
+};
+
+export default translations;

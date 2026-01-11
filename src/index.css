@@ -1,49 +1,218 @@
 @import "tailwindcss";
 
-/* === Custom Theme Colors === */
+/* ================= THEME TOKENS ================= */
 @layer base {
+    html {
+        --accent: #22d3ee;
+    }
+
     html.dark {
-        --bg: #0a0f1c;
-        --card: #111827;
-        --text: #f1f5f9;
-        --muted: #9ca3af;
+        --bg: radial-gradient(
+            circle at top,
+            #0b1222 0%,
+            #070b14 60%,
+            #05070d 100%
+        );
+        --card: #0f172a;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --border: #1e293b;
+        --shadow: 0 25px 50px rgba(0, 0, 0, 0.65);
     }
 
     html.light {
-        --bg: #f8fafc;
+        --bg: linear-gradient(to bottom, #f8fafc 0%, #eef2f7 100%);
         --card: #ffffff;
-        --text: #0a0f1c;
+        --text: #111827; /* Darker for better readability */
         --muted: #475569;
+        --border: #cbd5e1; /* Darker border for contrast */
+        --shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
     }
 
     body {
-        background-color: var(--bg);
+        background: var(--bg);
         color: var(--text);
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: background 0.4s ease, color 0.3s ease;
+        font-family: "Inter", sans-serif;
     }
 }
 
-/* Sizga kerak bo‘lsa, kartalar yoki knopkalar uchun ham CSS o‘zgaruvchilarni qo‘shish mumkin: */
-@layer components {
-    .card {
-        background-color: var(--card);
-        color: var(--text);
-        border: 1px solid var(--muted);
+/* ================= COMPONENTS ================= */
+
+/* ================= BUTTON STATES ================= */
+
+/* disabled holat */
+.btn-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+    filter: grayscale(0.3);
+}
+
+/* tayyor holat (valid) */
+.btn-ready {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0),
+        0 0 20px color-mix(in srgb, var(--accent) 45%, transparent),
+        0 0 45px color-mix(in srgb, var(--accent) 25%, transparent);
+    animation: btnPulse 1.6s ease-in-out infinite;
+}
+
+/* hover paytida bosilayotgan effekt */
+.btn-ready:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 55%, transparent),
+        0 0 35px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+/* bosilganda */
+.btn-ready:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 6px 15px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* nurning sekin pulsatsiyasi */
+@keyframes btnPulse {
+    0% {
+        box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+    50% {
+        box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 65%, transparent);
+    }
+    100% {
+        box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 35%, transparent);
     }
 }
+
+@layer components {
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .input,
+    .select {
+        background: var(--card);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .input:focus,
+    .select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+
+    .btn {
+        background: var(--accent);
+        color: #001018;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 10px 25px
+            color-mix(in srgb, var(--accent) 40%, transparent);
+        transition: transform 0.15s ease, box-shadow 0.15s ease,
+            filter 0.15s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 35px
+            color-mix(in srgb, var(--accent) 55%, transparent);
+        filter: brightness(1.1);
+    }
+
+    .tab {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        text-align: center;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--muted);
+    }
+
+    .tab-active {
+        background: var(--accent);
+        color: #001018;
+        border-color: transparent;
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .select-wrapper::after {
+        content: "▾";
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--text);
+        font-size: 0.75rem;
+    }
+
+    .select option {
+        background: var(--card);
+        color: var(--text);
+    }
+
+    /* ================= LOGO HOVER ================= */
+    .logo-hover {
+        transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .logo-hover:hover {
+        transform: scale(1.15);
+        filter: brightness(1.2);
+    }
+}
+
+/* ================= ANIMATIONS ================= */
 @layer utilities {
-    @keyframes fade-in {
+    .theme-fade {
+        animation: themeFade 0.35s ease;
+    }
+
+    @keyframes themeFade {
         from {
-            opacity: 0;
-            transform: scale(0.95);
+            opacity: 0.6;
+            transform: scale(0.98);
         }
         to {
             opacity: 1;
             transform: scale(1);
         }
     }
+}
+/* ================= LOGO TEXT ================= */
+.logo-text {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
 
-    .animate-fade-in {
-        animation: fade-in 0.5s ease forwards;
-    }
+/* DARK THEME — oq + ko‘k glow */
+html.dark .logo-text {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.55),
+        0 0 18px rgba(34, 211, 238, 0.35);
+}
+
+/* LIGHT THEME — ko‘k + yumshoq soya */
+html.light .logo-text {
+    color: #0ea5e9; /* chiroyli blue */
+    text-shadow: 0 2px 6px rgba(14, 165, 233, 0.35);
 }

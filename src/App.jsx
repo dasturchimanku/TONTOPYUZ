@@ -1,63 +1,69 @@
-import React from "react";
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
-} from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import translations from "./i18n/translations";
+import { useTheme } from "./hooks/useTheme";
+
+import Header from "./components/Header";
+import TonLogo from "./components/TonLogo";
+import BuySellTabs from "./components/BuySellTabs";
+import BuyTonForm from "./components/BuyTonForm"; // sotib olish
+import SellTonForm from "./components/SellTonForm"; // sotish
 import Footer from "./components/Footer";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { LangProvider } from "./contexts/LangContext";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-
-function PrivateRoute({ children }) {
-    const token = localStorage.getItem("admin_token");
-    const expires = parseInt(localStorage.getItem("admin_expires") || "0", 10);
-    const now = Math.floor(Date.now() / 1000);
-
-    if (!token || now > expires) {
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_expires");
-        localStorage.removeItem("admin_user");
-        return <Navigate to="/admin/login" replace />;
-    }
-
-    return children;
-}
 
 export default function App() {
+    const { themeMode, setThemeMode } = useTheme();
+    const [lang, setLang] = useState("uz");
+    const [mode, setMode] = useState("buy"); // "buy" yoki "sell"
+
+    const t = translations[lang];
+
     return (
-        <ThemeProvider>
-            <LangProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/admin/login" element={<AdminLogin />} />
-                        <Route
-                            path="/admin"
-                            element={
-                                <PrivateRoute>
-                                    <AdminDashboard />
-                                </PrivateRoute>
-                            }
+        <div className="min-h-screen px-4 pt-28">
+            <Header
+                lang={lang}
+                setLang={setLang}
+                themeMode={themeMode}
+                setThemeMode={setThemeMode}
+            />
+
+            <div className="flex justify-center mt-10">
+                <motion.div
+                    initial={{ opacity: 0, y: 25 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="card w-full max-w-xl"
+                >
+                    {/* Buy/Sell Tabs */}
+                    <BuySellTabs mode={mode} setMode={setMode} t={t} />
+
+                    {/* Sarlavha */}
+                    <h2 className="text-3xl font-semibold flex justify-center gap-3 mb-2">
+                        <TonLogo />
+                        {t[mode]}
+                    </h2>
+
+                    <p className="text-center text-[var(--muted)] mb-6">
+                        {mode === "buy" ? t.introBuy : t.introSell}
+                    </p>
+
+                    {/* ============================ */}
+                    {/* MODEGA KO‘RA ALOHIDA FORM */}
+                    {/* ============================ */}
+                    {mode === "buy" ? (
+                        <BuyTonForm
+                            t={{
+                                address: "TON manzilingizni kiriting",
+                                price: "Narx",
+                                pay: "Davom etish",
+                                invalid: "Noto‘g‘ri manzil",
+                            }}
                         />
-                        <Route
-                            path="*"
-                            element={
-                                <div className="min-h-screen flex flex-col">
-                                    <Navbar />
-                                    <main className="flex-grow px-4 sm:px-6 pt-16 sm:pt-0">
-                                        <Home />
-                                    </main>
-                                    <Footer />
-                                </div>
-                            }
-                        />
-                    </Routes>
-                </Router>
-            </LangProvider>
-        </ThemeProvider>
+                    ) : (
+                        <SellTonForm t={{}} />
+                    )}
+                </motion.div>
+            </div>
+
+            <Footer />
+        </div>
     );
 }
