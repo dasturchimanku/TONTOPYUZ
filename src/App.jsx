@@ -20,7 +20,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-white">
-            <Navbar phone={settings.phone} />
+            <Navbar phone={settings.phone} logo={settings.logo} />
             <Hero tagline={settings.heroTagline} />
             <Services services={services} />
             <Works works={works} />
