@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Hammer, Images, MessageSquareText, Settings as SettingsIcon, LogOut, Menu, X } from "lucide-react";
-import logo from "../assets/logo.png";
+import defaultLogo from "../assets/logo.png";
 import { api, getToken, setToken, clearToken } from "../api.js";
 import Dashboard from "./Dashboard.jsx";
 import ServicesAdmin from "./ServicesAdmin.jsx";
@@ -16,7 +16,7 @@ const tabs = [
     { id: "settings", label: "Sozlamalar", icon: SettingsIcon },
 ];
 
-function Login({ onOk }) {
+function Login({ onOk, logoSrc }) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ function Login({ onOk }) {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-flame-600 via-flame-500 to-flame-700 p-4">
             <form onSubmit={submit} className="w-full max-w-sm rounded-[2rem] bg-white p-8 shadow-2xl">
-                <img src={logo} alt="OYNUR BOUW" className="mx-auto h-16" />
+                <img src={logoSrc} alt="OYNUR BOUW" className="mx-auto h-16" />
                 <h1 className="mt-4 text-center font-display text-2xl font-extrabold text-stone-900">
                     Admin <span className="text-flame-500">Panel</span>
                 </h1>
@@ -69,6 +69,13 @@ export default function Admin() {
     const [checking, setChecking] = useState(true);
     const [tab, setTab] = useState("dashboard");
     const [menuOpen, setMenuOpen] = useState(false);
+    const [adminLogo, setAdminLogo] = useState("");
+
+    function refreshBranding() {
+        api.site()
+            .then((d) => setAdminLogo(d.settings?.logo || ""))
+            .catch(() => {});
+    }
 
     useEffect(() => {
         if (!getToken()) {
@@ -76,13 +83,18 @@ export default function Admin() {
             return;
         }
         api.overview()
-            .then(() => setAuthed(true))
+            .then(() => {
+                setAuthed(true);
+                refreshBranding();
+            })
             .catch(() => clearToken())
             .finally(() => setChecking(false));
     }, []);
 
     if (checking) return <div className="flex min-h-screen items-center justify-center text-stone-400">Yuklanmoqda...</div>;
-    if (!authed) return <Login onOk={() => setAuthed(true)} />;
+    if (!authed) return <Login onOk={() => setAuthed(true)} logoSrc={adminLogo || defaultLogo} />;
+
+    const brandingLogo = adminLogo || defaultLogo;
 
     async function logout() {
         try {
@@ -103,7 +115,7 @@ export default function Admin() {
                 }`}
             >
                 <div className="flex items-center gap-2.5">
-                    <img src={logo} alt="" className="h-9" />
+                    <img src={brandingLogo} alt="" className="h-9" />
                     <span className="font-display font-extrabold text-white">
                         OYNUR<span className="text-flame-500"> BOUW</span>
                     </span>
@@ -159,7 +171,7 @@ export default function Admin() {
                     {tab === "services" && <ServicesAdmin />}
                     {tab === "works" && <WorksAdmin />}
                     {tab === "leads" && <LeadsAdmin />}
-                    {tab === "settings" && <SettingsAdmin />}
+                    {tab === "settings" && <SettingsAdmin onLogoChanged={refreshBranding} />}
                 </div>
             </main>
         </div>

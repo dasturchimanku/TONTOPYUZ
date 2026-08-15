@@ -1,7 +1,8 @@
 import { Phone, Mail, MapPin, Instagram, Send } from "lucide-react";
-import logo from "../assets/logo.png";
+import defaultLogo from "../assets/logo.png";
 
 export default function Footer({ settings }) {
+    const logo = settings.logo || defaultLogo;
     return (
         <footer id="contact" className="bg-stone-950 pt-16 text-stone-300">
             <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 sm:px-6 md:grid-cols-3">

@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { api, setToken } from "../api.js";
+import ImagePicker from "./ImagePicker.jsx";
+import defaultLogo from "../assets/logo.png";
 
-export default function SettingsAdmin() {
+export default function SettingsAdmin({ onLogoChanged }) {
     const [form, setForm] = useState(null);
     const [newPassword, setNewPassword] = useState("");
     const [saving, setSaving] = useState(false);
+    const [logoSaving, setLogoSaving] = useState(false);
     const [msg, setMsg] = useState("");
     const [error, setError] = useState("");
 
@@ -39,6 +43,34 @@ export default function SettingsAdmin() {
         }
     }
 
+    async function saveLogo(logoUrl) {
+        setLogoSaving(true);
+        setError("");
+        try {
+            const updated = await api.settings.update({ logo: logoUrl });
+            setForm((f) => ({ ...f, ...updated }));
+            onLogoChanged?.();
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLogoSaving(false);
+        }
+    }
+
+    async function clearLogo() {
+        setLogoSaving(true);
+        setError("");
+        try {
+            const updated = await api.settings.update({ logo: "" });
+            setForm((f) => ({ ...f, ...updated }));
+            onLogoChanged?.();
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLogoSaving(false);
+        }
+    }
+
     const fields = [
         ["phone", "Telefon raqam"],
         ["email", "Email"],
@@ -52,6 +84,38 @@ export default function SettingsAdmin() {
     return (
         <div className="max-w-xl">
             <div className="rounded-3xl border border-flame-100 bg-white p-6 shadow-sm">
+                <h2 className="font-display text-lg font-extrabold text-stone-900">Logo</h2>
+                <p className="mt-1 text-sm text-stone-500">
+                    Sayt logosi — navbar, footer va admin panelda ko'rsatiladi. Bo'sh qoldirilsa standart OYNUR BOUW logosi ishlatiladi.
+                </p>
+
+                <div className="mt-5 flex items-start gap-5">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-stone-200 bg-white p-2">
+                        <img src={form.logo || defaultLogo} alt="Logo" className="max-h-full max-w-full object-contain" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <ImagePicker
+                            value={form.logo || ""}
+                            onChange={(url) => {
+                                set("logo", url);
+                                saveLogo(url);
+                            }}
+                        />
+                        {form.logo && (
+                            <button
+                                onClick={clearLogo}
+                                disabled={logoSaving}
+                                className="mt-2 inline-flex items-center gap-1.5 rounded-xl border-2 border-stone-200 px-3 py-1.5 text-xs font-bold text-stone-500 transition hover:border-red-300 hover:text-red-600 disabled:opacity-50"
+                            >
+                                <Trash2 size={14} /> Standart logoga qaytarish
+                            </button>
+                        )}
+                        {logoSaving && <p className="mt-2 text-xs font-semibold text-flame-600">Logo saqlanmoqda...</p>}
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-6 rounded-3xl border border-flame-100 bg-white p-6 shadow-sm">
                 <h2 className="font-display text-lg font-extrabold text-stone-900">Sayt sozlamalari</h2>
                 <div className="mt-5 space-y-4">
                     {fields.map(([key, label]) => (

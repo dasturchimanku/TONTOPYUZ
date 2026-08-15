@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import logo from "../assets/logo.png";
+import defaultLogo from "../assets/logo.png";
 
 const links = [
     { href: "#home", label: "Bosh sahifa" },
@@ -10,9 +10,8 @@ const links = [
     { href: "#contact", label: "Aloqa" },
 ];
 
-export default function Navbar({ phone }) {
-    const [open, setOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+export default function Navbar({ phone, logo }) {
+    const logoSrc = logo || defaultLogo;
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 30);
@@ -30,7 +29,7 @@ export default function Navbar({ phone }) {
             >
                 {/* Logo */}
                 <a href="#home" className="flex items-center gap-2.5">
-                    <img src={logo} alt="OYNUR BOUW logo" className="h-10 w-auto drop-shadow-sm" />
+                    <img src={logoSrc} alt="OYNUR BOUW logo" className="h-10 w-auto drop-shadow-sm" />
                     <span className="font-display text-lg font-extrabold tracking-tight text-stone-900">
                         OYNUR<span className="text-flame-500"> BOUW</span>
                     </span>

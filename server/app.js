@@ -255,7 +255,7 @@ export function createApp({ dbPath, uploadsDir, seedDbPath, seedUploadsDir }) {
     });
     app.put("/api/admin/settings", auth, (req, res) => {
         const db = loadDB();
-        const allowed = ["phone", "email", "address", "instagram", "telegram", "currency", "heroTagline"];
+        const allowed = ["phone", "email", "address", "instagram", "telegram", "currency", "heroTagline", "logo"];
         for (const k of allowed) {
             if (req.body?.[k] !== undefined) db.settings[k] = String(req.body[k]);
         }
