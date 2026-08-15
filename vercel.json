@@ -1,3 +1,16 @@
 {
-    "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+    "buildCommand": "vite build && mkdir -p dist/uploads && cp -r server/uploads/. dist/uploads/",
+    "outputDirectory": "dist",
+    "functions": {
+        "api/index.js": {
+            "includeFiles": "server/**",
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    },
+    "rewrites": [
+        { "source": "/api/(.*)", "destination": "/api" },
+        { "source": "/uploads/(.*)", "destination": "/api" },
+        { "source": "/(.*)", "destination": "/index.html" }
+    ]
 }

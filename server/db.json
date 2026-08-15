@@ -1,0 +1,128 @@
+{
+  "settings": {
+    "adminPassword": "oynur2026",
+    "phone": "+32 465 00 00 00",
+    "email": "info@oynurbouw.be",
+    "address": "Antwerpen, Belgium",
+    "instagram": "https://instagram.com/oynurbouw",
+    "telegram": "https://t.me/oynurbouw",
+    "currency": "€",
+    "heroTagline": "Qurilish va ta'mirlashda ishonchli hamkoringiz"
+  },
+  "services": [
+    {
+      "id": "srv1",
+      "title": "Qurilish ishlari",
+      "description": "Poydevordan tomgacha — uy va binolarni to'liq qurish, kengaytirish va qayta qurish ishlari.",
+      "image": "/uploads/service-qurilish.jpg",
+      "rate": 55,
+      "order": 0
+    },
+    {
+      "id": "srv2",
+      "title": "Ichki ta'mirlash",
+      "description": "Kvartira va uylarni to'liq ichki ta'mirlash: gipsokarton, shpaklyovka, pol va shift ishlari.",
+      "image": "/uploads/service-tamirlash.jpg",
+      "rate": 35,
+      "order": 1
+    },
+    {
+      "id": "srv3",
+      "title": "Tom ishlari",
+      "description": "Tom yopish, izolyatsiya va ta'mirlash — cherepitsa, metall va yassi tomlar bo'yicha mutaxassislar.",
+      "image": "/uploads/service-tom.jpg",
+      "rate": 48,
+      "order": 2
+    },
+    {
+      "id": "srv4",
+      "title": "Elektr montaj",
+      "description": "Elektr tarmoqlarini loyihalash va o'rnatish, rozetka, yoritish va taqsimlash qutilari.",
+      "image": "/uploads/service-elektr.jpg",
+      "rate": 28,
+      "order": 3
+    },
+    {
+      "id": "srv5",
+      "title": "Bo'yoq ishlari",
+      "description": "Ichki va tashqi devorlarni professional bo'yash, dekorativ qoplamalar va oboy ishlari.",
+      "image": "/uploads/service-boyoq.jpg",
+      "rate": 18,
+      "order": 4
+    },
+    {
+      "id": "srv6",
+      "title": "Kafel va plitka",
+      "description": "Hammom, oshxona va pollarga kafel-plitka yotqizish — aniq geometriya va toza ish.",
+      "image": "/uploads/service-kafel.jpg",
+      "rate": 32,
+      "order": 5
+    }
+  ],
+  "works": [
+    {
+      "id": "w1",
+      "title": "Mehmonxona ta'miri",
+      "category": "Interyer",
+      "image": "/uploads/work-mehmonxona.jpg",
+      "order": 0
+    },
+    {
+      "id": "w2",
+      "title": "Fasad yangilash",
+      "category": "Fasad",
+      "image": "/uploads/work-fasad.jpg",
+      "order": 1
+    },
+    {
+      "id": "w3",
+      "title": "Oshxona remonti",
+      "category": "Oshxona",
+      "image": "/uploads/work-oshxona.jpg",
+      "order": 2
+    },
+    {
+      "id": "w4",
+      "title": "Tom yopish",
+      "category": "Tom",
+      "image": "/uploads/work-tom.jpg",
+      "order": 3
+    },
+    {
+      "id": "w5",
+      "title": "Hammom renovatsiyasi",
+      "category": "Hammom",
+      "image": "/uploads/work-hammom.jpg",
+      "order": 4
+    },
+    {
+      "id": "w6",
+      "title": "Zamonaviy interyer",
+      "category": "Interyer",
+      "image": "/uploads/work-interyer.jpg",
+      "order": 5
+    },
+    {
+      "id": "w7",
+      "title": "Uy fasadi",
+      "category": "Fasad",
+      "image": "/uploads/work-fasad2.jpg",
+      "order": 6
+    },
+    {
+      "id": "w8",
+      "title": "Hammom ta'miri",
+      "category": "Hammom",
+      "image": "/uploads/work-hammom2.jpg",
+      "order": 7
+    },
+    {
+      "id": "w9",
+      "title": "Loyiha jarayoni",
+      "category": "Jarayon",
+      "image": "/uploads/work-jarayon.jpg",
+      "order": 8
+    }
+  ],
+  "leads": []
+}

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Runtime lead ma'lumotlari o'zgarishi mumkin, lekin boshlang'ich db.json git'da qoladi
+
+# Vercel
+.vercel

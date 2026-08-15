@@ -1,69 +1,31 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import translations from "./i18n/translations";
-import { useTheme } from "./hooks/useTheme";
-
-import Header from "./components/Header";
-import TonLogo from "./components/TonLogo";
-import BuySellTabs from "./components/BuySellTabs";
-import BuyTonForm from "./components/BuyTonForm"; // sotib olish
-import SellTonForm from "./components/SellTonForm"; // sotish
-import Footer from "./components/Footer";
+import { useEffect, useState } from "react";
+import Navbar from "./components/Navbar.jsx";
+import Hero from "./components/Hero.jsx";
+import Services from "./components/Services.jsx";
+import Works from "./components/Works.jsx";
+import Estimator from "./components/Estimator.jsx";
+import Footer from "./components/Footer.jsx";
+import { api } from "./api.js";
 
 export default function App() {
-    const { themeMode, setThemeMode } = useTheme();
-    const [lang, setLang] = useState("uz");
-    const [mode, setMode] = useState("buy"); // "buy" yoki "sell"
+    const [data, setData] = useState(null);
 
-    const t = translations[lang];
+    useEffect(() => {
+        api.site().then(setData).catch(console.error);
+    }, []);
+
+    const settings = data?.settings || {};
+    const services = data?.services || [];
+    const works = data?.works || [];
 
     return (
-        <div className="min-h-screen px-4 pt-28">
-            <Header
-                lang={lang}
-                setLang={setLang}
-                themeMode={themeMode}
-                setThemeMode={setThemeMode}
-            />
-
-            <div className="flex justify-center mt-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 25 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="card w-full max-w-xl"
-                >
-                    {/* Buy/Sell Tabs */}
-                    <BuySellTabs mode={mode} setMode={setMode} t={t} />
-
-                    {/* Sarlavha */}
-                    <h2 className="text-3xl font-semibold flex justify-center gap-3 mb-2">
-                        <TonLogo />
-                        {t[mode]}
-                    </h2>
-
-                    <p className="text-center text-[var(--muted)] mb-6">
-                        {mode === "buy" ? t.introBuy : t.introSell}
-                    </p>
-
-                    {/* ============================ */}
-                    {/* MODEGA KO‘RA ALOHIDA FORM */}
-                    {/* ============================ */}
-                    {mode === "buy" ? (
-                        <BuyTonForm
-                            t={{
-                                address: "TON manzilingizni kiriting",
-                                price: "Narx",
-                                pay: "Davom etish",
-                                invalid: "Noto‘g‘ri manzil",
-                            }}
-                        />
-                    ) : (
-                        <SellTonForm t={{}} />
-                    )}
-                </motion.div>
-            </div>
-
-            <Footer />
+        <div className="min-h-screen bg-white">
+            <Navbar phone={settings.phone} />
+            <Hero tagline={settings.heroTagline} />
+            <Services services={services} />
+            <Works works={works} />
+            <Estimator services={services} currency={settings.currency || "€"} />
+            <Footer settings={settings} />
         </div>
     );
 }
