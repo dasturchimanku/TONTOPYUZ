@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api.js";
+import { api, setToken } from "../api.js";
 
 export default function SettingsAdmin() {
     const [form, setForm] = useState(null);
@@ -24,6 +24,11 @@ export default function SettingsAdmin() {
             const payload = { ...form };
             if (newPassword) payload.newPassword = newPassword;
             const updated = await api.settings.update(payload);
+            // Parol o'zgargan bo'lsa server yangi token qaytaradi — sessiya uzilmasligi uchun saqlaymiz
+            if (updated.token) {
+                setToken(updated.token);
+                delete updated.token;
+            }
             setForm(updated);
             setNewPassword("");
             setMsg("Sozlamalar saqlandi ✓");
